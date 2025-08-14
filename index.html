@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加密货币情绪分析仪表板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .config-panel {
+            padding: 30px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .results-panel {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .weight-group {
+            display: grid;
+            grid-template-columns: 1fr 80px;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .weight-display {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .score-display {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .data-details {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .score-value {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 加密货币情绪分析</h1>
+            <p>实时监控市场情绪，智能分析投资趋势</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="config-panel">
+                <form id="sentimentForm">
+                    <div class="form-group">
+                        <label for="youtuber">YouTube 博主</label>
+                        <input type="text" id="youtuber" name="youtuber" placeholder="例: Coin Bureau, Altcoin Daily" value="Coin Bureau">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reddit_community">Reddit 社区</label>
+                        <input type="text" id="reddit_community" name="reddit_community" placeholder="例: r/cryptocurrency, r/bitcoin" value="r/cryptocurrency">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="crypto_symbol">加密货币符号</label>
+                        <input type="text" id="crypto_symbol" name="crypto_symbol" placeholder="例: BTC, ETH, SOL" value="BTC">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>权重设置 (总计: <span id="total_weight">100</span>%)</label>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">YouTube 权重</div>
+                            <div class="weight-group">
+                                <input type="range" id="youtube_weight" min="0" max="100" value="25">
+                                <div class="weight-display"><span id="youtube_weight_display">25</span>%</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">Reddit 权重</div>
+                            <div class="weight-group">
+                                <input type="range" id="reddit_weight" min="0" max="100" value="25">
+                                <div class="weight-display"><span id="reddit_weight_display">25</span>%</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">Google Trends 权重</div>
+                            <div class="weight-group">
+                                <input type="range" id="trends_weight" min="0" max="100" value="25">
+                                <div class="weight-display"><span id="trends_weight_display">25</span>%</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">CMC 情绪权重</div>
+                            <div class="weight-group">
+                                <input type="range" id="cmc_weight" min="0" max="100" value="25">
+                                <div class="weight-display"><span id="cmc_weight_display">25</span>%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="analyzeBtn">
+                        分析市场情绪
+                    </button>
+                </form>
+            </div>
+            
+            <div class="results-panel">
+                <div class="score-display" id="scoreDisplay" style="display: none;">
+                    <div class="score-value" id="scoreValue">--</div>
+                    <div class="score-label">情绪分数</div>
+                    
+                    <div class="data-details" id="dataDetails">
+                        <div class="data-item">
+                            <span>YouTube:</span>
+                            <span id="youtube_score">--</span>
+                        </div>
+                        <div class="data-item">
+                            <span>Reddit:</span>
+                            <span id="reddit_score">--</span>
+                        </div>
+                        <div class="data-item">
+                            <span>Google Trends:</span>
+                            <span id="trends_score">--</span>
+                        </div>
+                        <div class="data-item">
+                            <span>CMC 情绪:</span>
+                            <span id="cmc_score">--</span>
+                        </div>
+                        <div class="data-item" style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: 10px; margin-top: 10px; font-weight: bold;">
+                            <span>最终分数:</span>
+                            <span id="final_score">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>正在分析市场数据...</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">这可能需要几秒钟</p>
+                </div>
+                
+                <div class="error" id="error"></div>
+                
+                <div id="welcomeMessage">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">📈</div>
+                        <h3 style="margin-bottom: 15px;">欢迎使用情绪分析工具</h3>
+                        <p style="opacity: 0.9; line-height: 1.6;">
+                            配置您的参数，然后点击分析按钮<br>
+                            获取实时的市场情绪分数
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 权重滑动条更新
+        const weightInputs = ['youtube_weight', 'reddit_weight', 'trends_weight', 'cmc_weight'];
+        
+        weightInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(inputId + '_display');
+            
+            input.addEventListener('input', function() {
+                display.textContent = this.value;
+                updateTotalWeight();
+            });
+        });
+        
+        function updateTotalWeight() {
+            const total = weightInputs.reduce((sum, inputId) => {
+                return sum + parseInt(document.getElementById(inputId).value);
+            }, 0);
+            
+            document.getElementById('total_weight').textContent = total;
+            
+            // 如果总权重不是100，显示警告颜色
+            const totalDisplay = document.getElementById('total_weight');
+            totalDisplay.style.color = total === 100 ? '#2c3e50' : '#ff6b6b';
+        }
+        
+        // 表单提交
+        document.getElementById('sentimentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // 检查权重总和
+            const total = weightInputs.reduce((sum, inputId) => {
+                return sum + parseInt(document.getElementById(inputId).value);
+            }, 0);
+            
+            if (total !== 100) {
+                showError('权重总和必须等于100%');
+                return;
+            }
+            
+            // 显示加载状态
+            showLoading();
+            
+            // 收集表单数据
+            const formData = {
+                youtuber: document.getElementById('youtuber').value,
+                reddit_community: document.getElementById('reddit_community').value,
+                crypto_symbol: document.getElementById('crypto_symbol').value,
+                weights: {
+                    youtube: parseInt(document.getElementById('youtube_weight').value),
+                    reddit: parseInt(document.getElementById('reddit_weight').value),
+                    trends: parseInt(document.getElementById('trends_weight').value),
+                    cmc: parseInt(document.getElementById('cmc_weight').value)
+                }
+            };
+            
+            try {
+                // 调用你的 webhook
+                const response = await fetch('https://n8n-utdwjbhe.ap-southeast-1.clawcloudrun.com/webhook/Crypto%20Sentiment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // 显示结果
+                showResults(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('分析失败，请检查网络连接或稍后重试。错误信息: ' + error.message);
+            }
+        });
+        
+        function showLoading() {
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('scoreDisplay').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analyzeBtn').disabled = true;
+        }
+        
+        function showResults(data) {
+            // 这里你需要根据你的 webhook 返回的数据格式来调整
+            // 假设返回格式如下：
+            /*
+            {
+                "youtube_score": 75,
+                "reddit_score": 60,
+                "trends_score": 80,
+                "cmc_score": 70,
+                "final_score": 71.25
+            }
+            */
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('scoreDisplay').style.display = 'block';
+            document.getElementById('analyzeBtn').disabled = false;
+            
+            // 更新分数显示
+            document.getElementById('scoreValue').textContent = Math.round(data.final_score || 0);
+            document.getElementById('youtube_score').textContent = data.youtube_score || '--';
+            document.getElementById('reddit_score').textContent = data.reddit_score || '--';
+            document.getElementById('trends_score').textContent = data.trends_score || '--';
+            document.getElementById('cmc_score').textContent = data.cmc_score || '--';
+            document.getElementById('final_score').textContent = Math.round(data.final_score || 0);
+            
+            // 根据分数改变颜色
+            const scoreValue = document.getElementById('scoreValue');
+            const score = data.final_score || 0;
+            if (score >= 70) {
+                scoreValue.style.color = '#4CAF50'; // 绿色 - 积极
+            } else if (score >= 40) {
+                scoreValue.style.color = '#FFC107'; // 黄色 - 中性
+            } else {
+                scoreValue.style.color = '#F44336'; // 红色 - 消极
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('scoreDisplay').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = message;
+            document.getElementById('analyzeBtn').disabled = false;
+        }
+    </script>
+</body>
+</html>
