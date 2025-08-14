@@ -2,12 +2,11 @@
   "name": "crypto-sentiment-dashboard",
   "version": "1.0.0",
   "description": "实时加密货币情绪分析仪表板",
-  "main": "index.html",
   "scripts": {
-    "dev": "python -m http.server 8000",
-    "build": "echo 'No build needed for static HTML'"
+    "build": "mkdir -p public && cp index.html public/",
+    "dev": "python -m http.server 8000"
   },
   "keywords": ["crypto", "sentiment", "dashboard"],
-  "author": "Your Name",
+  "author": "Daniel",
   "license": "MIT"
 }
