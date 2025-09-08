@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>加密货币情绪分析仪表板</title>
+    <title>加密货币情绪分析仪表板 / Crypto Sentiment Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -32,6 +32,7 @@
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
         }
 
         .header h1 {
@@ -43,6 +44,38 @@
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 5px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e3c72;
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .main-content {
@@ -215,39 +248,71 @@
             .score-value {
                 font-size: 3rem;
             }
+
+            .lang-switch {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 10px auto 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 加密货币情绪分析</h1>
-            <p>实时监控市场情绪，智能分析投资趋势</p>
+            <div class="lang-switch">
+                <button class="lang-btn active" onclick="switchLanguage('zh')">中文</button>
+                <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+            </div>
+            <h1>
+                <span class="zh">🚀 加密货币情绪分析</span>
+                <span class="en" style="display: none;">🚀 Crypto Sentiment Analysis</span>
+            </h1>
+            <p>
+                <span class="zh">实时监控市场情绪，智能分析投资趋势</span>
+                <span class="en" style="display: none;">Real-time Market Sentiment Monitoring & Investment Trend Analysis</span>
+            </p>
         </div>
         
         <div class="main-content">
             <div class="config-panel">
                 <form id="sentimentForm">
                     <div class="form-group">
-                        <label for="youtuber">YouTube 博主</label>
-                        <input type="text" id="youtuber" name="youtuber" placeholder="例: Coin Bureau, Altcoin Daily" value="Coin Bureau">
+                        <label for="youtuber">
+                            <span class="zh">YouTube 博主</span>
+                            <span class="en" style="display: none;">YouTube Creator</span>
+                        </label>
+                        <input type="text" id="youtuber" name="youtuber" placeholder="Coin Bureau, Altcoin Daily" value="Coin Bureau">
                     </div>
                     
                     <div class="form-group">
-                        <label for="reddit_community">Reddit 社区</label>
-                        <input type="text" id="reddit_community" name="reddit_community" placeholder="例: r/cryptocurrency, r/bitcoin" value="r/cryptocurrency">
+                        <label for="reddit_community">
+                            <span class="zh">Reddit 社区</span>
+                            <span class="en" style="display: none;">Reddit Community</span>
+                        </label>
+                        <input type="text" id="reddit_community" name="reddit_community" placeholder="r/cryptocurrency, r/bitcoin" value="r/cryptocurrency">
                     </div>
                     
                     <div class="form-group">
-                        <label for="crypto_symbol">加密货币符号</label>
-                        <input type="text" id="crypto_symbol" name="crypto_symbol" placeholder="例: BTC, ETH, SOL" value="BTC">
+                        <label for="crypto_symbol">
+                            <span class="zh">加密货币符号</span>
+                            <span class="en" style="display: none;">Crypto Symbol</span>
+                        </label>
+                        <input type="text" id="crypto_symbol" name="crypto_symbol" placeholder="BTC, ETH, SOL" value="BTC">
                     </div>
                     
                     <div class="form-group">
-                        <label>权重设置 (总计: <span id="total_weight">100</span>%)</label>
+                        <label>
+                            <span class="zh">权重设置 (总计: <span id="total_weight">100</span>%)</span>
+                            <span class="en" style="display: none;">Weight Settings (Total: <span id="total_weight_en">100</span>%)</span>
+                        </label>
                         
                         <div style="margin-bottom: 15px;">
-                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">YouTube 权重</div>
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">
+                                <span class="zh">YouTube 权重</span>
+                                <span class="en" style="display: none;">YouTube Weight</span>
+                            </div>
                             <div class="weight-group">
                                 <input type="range" id="youtube_weight" min="0" max="100" value="25">
                                 <div class="weight-display"><span id="youtube_weight_display">25</span>%</div>
@@ -255,7 +320,10 @@
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">Reddit 权重</div>
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">
+                                <span class="zh">Reddit 权重</span>
+                                <span class="en" style="display: none;">Reddit Weight</span>
+                            </div>
                             <div class="weight-group">
                                 <input type="range" id="reddit_weight" min="0" max="100" value="25">
                                 <div class="weight-display"><span id="reddit_weight_display">25</span>%</div>
@@ -263,7 +331,10 @@
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">Google Trends 权重</div>
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">
+                                <span class="zh">Google Trends 权重</span>
+                                <span class="en" style="display: none;">Google Trends Weight</span>
+                            </div>
                             <div class="weight-group">
                                 <input type="range" id="trends_weight" min="0" max="100" value="25">
                                 <div class="weight-display"><span id="trends_weight_display">25</span>%</div>
@@ -271,7 +342,10 @@
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">CMC 情绪权重</div>
+                            <div style="margin-bottom: 5px; font-size: 0.8rem; color: #666;">
+                                <span class="zh">CMC 情绪权重</span>
+                                <span class="en" style="display: none;">CMC Sentiment Weight</span>
+                            </div>
                             <div class="weight-group">
                                 <input type="range" id="cmc_weight" min="0" max="100" value="25">
                                 <div class="weight-display"><span id="cmc_weight_display">25</span>%</div>
@@ -280,7 +354,8 @@
                     </div>
                     
                     <button type="submit" class="btn" id="analyzeBtn">
-                        分析市场情绪
+                        <span class="zh">分析市场情绪</span>
+                        <span class="en" style="display: none;">Analyze Market Sentiment</span>
                     </button>
                 </form>
             </div>
@@ -288,7 +363,10 @@
             <div class="results-panel">
                 <div class="score-display" id="scoreDisplay" style="display: none;">
                     <div class="score-value" id="scoreValue">--</div>
-                    <div class="score-label">情绪分数</div>
+                    <div class="score-label">
+                        <span class="zh">情绪分数</span>
+                        <span class="en" style="display: none;">Sentiment Score</span>
+                    </div>
                     
                     <div class="data-details" id="dataDetails">
                         <div class="data-item">
@@ -304,11 +382,17 @@
                             <span id="trends_score">--</span>
                         </div>
                         <div class="data-item">
-                            <span>CMC 情绪:</span>
+                            <span>
+                                <span class="zh">CMC 情绪:</span>
+                                <span class="en" style="display: none;">CMC Sentiment:</span>
+                            </span>
                             <span id="cmc_score">--</span>
                         </div>
                         <div class="data-item" style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: 10px; margin-top: 10px; font-weight: bold;">
-                            <span>最终分数:</span>
+                            <span>
+                                <span class="zh">最终分数:</span>
+                                <span class="en" style="display: none;">Final Score:</span>
+                            </span>
                             <span id="final_score">--</span>
                         </div>
                     </div>
@@ -316,8 +400,14 @@
                 
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <p>正在分析市场数据...</p>
-                    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">这可能需要几秒钟</p>
+                    <p>
+                        <span class="zh">正在分析市场数据...</span>
+                        <span class="en" style="display: none;">Analyzing market data...</span>
+                    </p>
+                    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">
+                        <span class="zh">这可能需要几秒钟</span>
+                        <span class="en" style="display: none;">This may take a few seconds</span>
+                    </p>
                 </div>
                 
                 <div class="error" id="error"></div>
@@ -325,10 +415,13 @@
                 <div id="welcomeMessage">
                     <div style="text-align: center;">
                         <div style="font-size: 3rem; margin-bottom: 20px;">📈</div>
-                        <h3 style="margin-bottom: 15px;">欢迎使用情绪分析工具</h3>
+                        <h3 style="margin-bottom: 15px;">
+                            <span class="zh">欢迎使用情绪分析工具</span>
+                            <span class="en" style="display: none;">Welcome to Sentiment Analysis Tool</span>
+                        </h3>
                         <p style="opacity: 0.9; line-height: 1.6;">
-                            配置您的参数，然后点击分析按钮<br>
-                            获取实时的市场情绪分数
+                            <span class="zh">配置您的参数，然后点击分析按钮<br>获取实时的市场情绪分数</span>
+                            <span class="en" style="display: none;">Configure your parameters and click analyze<br>to get real-time market sentiment score</span>
                         </p>
                     </div>
                 </div>
@@ -337,6 +430,30 @@
     </div>
 
     <script>
+        let currentLanguage = 'zh';
+        
+        // 语言切换功能
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 切换文本显示
+            document.querySelectorAll('.zh').forEach(el => {
+                el.style.display = lang === 'zh' ? 'inline' : 'none';
+            });
+            document.querySelectorAll('.en').forEach(el => {
+                el.style.display = lang === 'en' ? 'inline' : 'none';
+            });
+            
+            // 更新HTML lang属性
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+        }
+        
         // 权重滑动条更新
         const weightInputs = ['youtube_weight', 'reddit_weight', 'trends_weight', 'cmc_weight'];
         
@@ -356,10 +473,14 @@
             }, 0);
             
             document.getElementById('total_weight').textContent = total;
+            document.getElementById('total_weight_en').textContent = total;
             
             // 如果总权重不是100，显示警告颜色
             const totalDisplay = document.getElementById('total_weight');
-            totalDisplay.style.color = total === 100 ? '#2c3e50' : '#ff6b6b';
+            const totalDisplayEn = document.getElementById('total_weight_en');
+            const color = total === 100 ? '#2c3e50' : '#ff6b6b';
+            totalDisplay.style.color = color;
+            totalDisplayEn.style.color = color;
         }
         
         // 表单提交
@@ -372,7 +493,10 @@
             }, 0);
             
             if (total !== 100) {
-                showError('权重总和必须等于100%');
+                const errorMsg = currentLanguage === 'zh' 
+                    ? '权重总和必须等于100%' 
+                    : 'Weight total must equal 100%';
+                showError(errorMsg);
                 return;
             }
             
@@ -413,7 +537,10 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                showError('分析失败，请检查网络连接或稍后重试。错误信息: ' + error.message);
+                const errorMsg = currentLanguage === 'zh'
+                    ? '分析失败，请检查网络连接或稍后重试。错误信息: ' + error.message
+                    : 'Analysis failed, please check network connection or try again later. Error: ' + error.message;
+                showError(errorMsg);
             }
         });
         
@@ -426,18 +553,6 @@
         }
         
         function showResults(data) {
-            // 这里你需要根据你的 webhook 返回的数据格式来调整
-            // 假设返回格式如下：
-            /*
-            {
-                "youtube_score": 75,
-                "reddit_score": 60,
-                "trends_score": 80,
-                "cmc_score": 70,
-                "final_score": 71.25
-            }
-            */
-            
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'none';
             document.getElementById('welcomeMessage').style.display = 'none';
